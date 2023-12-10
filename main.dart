@@ -1,39 +1,13 @@
 import 'package:flutter/material.dart';
-import 'dart:async';
-import 'dart:convert';
-import 'package:http/http.dart' as http;
+import 'package:internship/btnNavigationBar/AlbumPage.dart';
+import 'package:internship/btnNavigationBar/PostPage.dart';
+import 'package:internship/btnNavigationBar/TodosPage.dart';
+import 'package:internship/two.dart';
+import 'package:internship/btnNavigationBar/photos.dart';
+
 
 void main() {
   runApp(const MyApp());
-}
-
-Future<List<Data>> fetchData() async {
-  var url = Uri.parse('https://jsonplaceholder.typicode.com/posts');
-  final response = await http.get(url);
-  if (response.statusCode == 200) {
-    List jsonResponse = json.decode(response.body);
-    return jsonResponse.map((data) => Data.fromJson(data)).toList();
-  } else {
-    throw Exception('Unexpected error occur!');
-  }
-}
-
-class Data {
-  final int userId;
-  final int id;
-  final String title;
-  final String body;
-
-  Data({required this.userId, required this.id, required this.title, required this.body});
-
-  factory Data.fromJson(Map<String, dynamic> json) {
-    return Data(
-      userId: json['userId'],
-      id: json['id'],
-      title: json['title'],
-      body: json['body'],
-    );
-  }
 }
 
 class MyApp extends StatelessWidget {
@@ -42,7 +16,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
+      title: 'BtnNaviagation Bar',
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
@@ -51,51 +25,53 @@ class MyApp extends StatelessWidget {
   }
 }
 
-class MyHomePage extends StatelessWidget {
+class MyHomePage extends StatefulWidget {
   const MyHomePage({super.key});
 
   @override
+  State<MyHomePage> createState() => _MyHomePageState();
+}
+
+class _MyHomePageState extends State<MyHomePage> {
+  int myIndex=0;
+  List pages=const[
+    PostPage(),
+    AlbumPage(),
+    TodosPage(),
+    PhotoPage(),
+  ];
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(
-          title: const Text('Flutter ListView'),
-        ),
-        body: const MyStatefulWidget());
-  }
-}
-
-class MyStatefulWidget extends StatefulWidget {
-  const MyStatefulWidget({super.key});
-
-  @override
-  State<MyStatefulWidget> createState() => _MyStatefulWidgetState();
-}
-
-class _MyStatefulWidgetState extends State<MyStatefulWidget> {
-  @override
-  Widget build(BuildContext context) {
-    return FutureBuilder<List<Data>>(
-      future: fetchData(),
-      builder: (context, snapshot) {
-        if (snapshot.hasData) {
-          const SizedBox(height: 100.0,);
-          return ListView.builder(
-              itemCount: snapshot.data!.length,
-              itemBuilder: (BuildContext context, int index) {
-                return ListTile(
-                  title:Text(snapshot.data![index].title,textAlign: TextAlign.center,
-                  style:const TextStyle(backgroundColor: Colors.grey)),
-
-                  subtitle:Text(snapshot.data![index].body,textAlign: TextAlign.center),
-                );
-              });
-        } else if (snapshot.hasError) {
-          return Text(snapshot.error.toString());
-        }
-        return const CircularProgressIndicator();
-      },
+      appBar: AppBar(
+        title: const Text('BottomNavigation Bar'),
+        centerTitle: true,
+        backgroundColor: Colors.blueGrey,
+      ),
+      bottomNavigationBar: BottomNavigationBar(
+        backgroundColor: Colors.lightGreen,
+        type: BottomNavigationBarType.fixed,
+        onTap: (index){
+          setState(() {
+            myIndex=index;
+          });
+        },
+        currentIndex: myIndex,
+        items: const [
+          BottomNavigationBarItem(
+              icon: Icon(Icons.post_add),
+              label: 'Post'),
+          BottomNavigationBarItem(
+              icon: Icon(Icons.album),
+              label: 'Albums'),
+          BottomNavigationBarItem(
+              icon: Icon(Icons.details),
+              label: 'Todos'),
+          BottomNavigationBarItem(
+              icon: Icon(Icons.photo),
+              label: 'Photos'),
+        ],
+      ),
     );
   }
 }
-
-
